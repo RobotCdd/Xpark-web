@@ -1,55 +1,43 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 
 function EditUser() {
     const { id } = useParams();
     const navigate = useNavigate();
 
-    // Dummy users list for demonstration
-    const [users, setUsers] = useState([
-        { id: 1, email: "user1@example.com" },
-        { id: 2, email: "user2@example.com" },
-        { id: 3, email: "user3@example.com" },
-        { id: 4, email: "user4@example.com" },
-        { id: 5, email: "user5@example.com" },
-        { id: 6, email: "user6@example.com" },
-        { id: 7, email: "user7@example.com" },
-        { id: 8, email: "user8@example.com" },
-        { id: 9, email: "user9@example.com" },
-        { id: 10, email: "user10@example.com" },
-    ]);
-
-    const user = users.find((u) => u.id === Number(id));
-
-    // Local state for checkboxes (pending changes)
+    const [users, setUsers] = useState([]);
     const [pending, setPending] = useState({
         isSuspended: false,
         resetPassword: false,
         resetStatistics: false,
     });
-
-    // Saved state
     const [saved, setSaved] = useState({
         isSuspended: false,
         statistics: { gamesPlayed: 42, score: 1000 },
     });
 
-    // Add a new user
-    const handleAddUser = () => {
-        const newId = users.length ? Math.max(...users.map(u => u.id)) + 1 : 1;
-        const newEmail = `user${newId}@example.com`;
-        setUsers([...users, { id: newId, email: newEmail }]);
-        alert(`Added user: ${newEmail}`);
-    };
+    useEffect(() => {
+        fetch("http://127.0.0.1:8000/users/")
+            .then(res => res.json())
+            .then(data => {
+                setUsers(data);
+                const user = data.find((u) => u.id === Number(id));
+                if (user) {
+                    setPending((prev) => ({
+                        ...prev,
+                        isSuspended: user.is_suspended || false,
+                    }));
+                    setSaved((prev) => ({
+                        ...prev,
+                        isSuspended: user.is_suspended || false,
+                    }));
+                }
+            })
+            .catch(err => console.error("Failed to fetch users:", err));
+    }, [id]);
 
-    // Drop (delete) user
-    const handleDropUser = () => {
-        setUsers(users.filter((u) => u.id !== Number(id)));
-        alert(`User #${id} dropped`);
-        navigate("/edit");
-    };
+    const user = users.find((u) => u.id === Number(id));
 
-    // Handle checkbox changes
     const handleCheckbox = (field) => {
         setPending((prev) => ({
             ...prev,
@@ -57,25 +45,40 @@ function EditUser() {
         }));
     };
 
-    // Save changes
-    const handleSave = (e) => {
+    const handleSave = async (e) => {
         e.preventDefault();
+
+        if (pending.isSuspended !== saved.isSuspended) {
+            await fetch(`http://127.0.0.1:8000/users/${id}/suspend/`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ is_suspended: pending.isSuspended }),
+            });
+        }
+
+        if (pending.resetPassword) {
+            const newPassword = prompt("Enter new password for this user:");
+            if (newPassword) {
+                await fetch(`http://127.0.0.1:8000/users/${id}/reset-password/`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ password: newPassword }),
+                });
+                alert("Password reset!");
+            }
+        }
+
+        // Reset statistics (dummy)
         let newStats = saved.statistics;
         if (pending.resetStatistics) {
             newStats = { gamesPlayed: 0, score: 0 };
             alert(`Statistics reset for user #${id} (dummy action)`);
         }
-        if (pending.resetPassword) {
-            alert(`Password reset for user #${id} (dummy action)`);
-        }
-        if (pending.isSuspended !== saved.isSuspended) {
-            alert(`User #${id} ${pending.isSuspended ? "suspended" : "unsuspended"} (dummy action)`);
-        }
+
         setSaved({
             isSuspended: pending.isSuspended,
             statistics: newStats,
         });
-        // Reset one-time actions
         setPending((prev) => ({
             ...prev,
             resetPassword: false,
@@ -85,10 +88,10 @@ function EditUser() {
 
     return (
         <div className="p-8 bg-black h-screen text-white flex justify-center items-center flex-col">
-            <button onClick={() => navigate("/edit")} className="mb-6 text-white hover:underline">
+            <button onClick={() => window.location.href = "/edit"} className="mb-6 text-white hover:underline">
                 ← Go back
             </button>
-            <h1 className="text-2xl font-bold mb-6">User Settings #{id}</h1>
+            <h1 className="text-3xl font-bold mb-6">User Settings #{id}</h1>
             <form onSubmit={handleSave} className="max-w-md space-y-6">
                 <div className="flex items-center space-x-3">
                     <input
@@ -96,7 +99,7 @@ function EditUser() {
                         id="suspend"
                         checked={pending.isSuspended}
                         onChange={() => handleCheckbox("isSuspended")}
-                        className="w-5 h-5 accent-orange-600"
+                        className="w-5 h-5"
                     />
                     <label htmlFor="suspend" className="text-lg select-none">
                         Suspend User
@@ -108,7 +111,7 @@ function EditUser() {
                         id="resetPassword"
                         checked={pending.resetPassword}
                         onChange={() => handleCheckbox("resetPassword")}
-                        className="w-5 h-5 accent-yellow-600"
+                        className="w-5 h-5"
                     />
                     <label htmlFor="resetPassword" className="text-lg select-none">
                         Reset Password
@@ -120,31 +123,15 @@ function EditUser() {
                         id="resetStatistics"
                         checked={pending.resetStatistics}
                         onChange={() => handleCheckbox("resetStatistics")}
-                        className="w-5 h-5 accent-purple-600"
+                        className="w-5 h-5"
                     />
                     <label htmlFor="resetStatistics" className="text-lg select-none">
                         Reset Statistics
                     </label>
                 </div>
-                <div className="flex items-center space-x-3">
-                    <button
-                        type="button"
-                        onClick={handleAddUser}
-                        className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded"
-                    >
-                        Add New User
-                    </button>
-                    <button
-                        type="button"
-                        onClick={handleDropUser}
-                        className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded"
-                    >
-                        Drop User
-                    </button>
-                </div>
                 <button
                     type="submit"
-                    className="w-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded"
+                    className="w-full bg-fuchsia-700 hover:bg-fuchsia-900 text-white px-4 py-2 rounded"
                 >
                     Save Changes
                 </button>

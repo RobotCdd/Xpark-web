@@ -1,9 +1,14 @@
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 function Main() {
     const [dropdownOpen, setDropdownOpen] = useState(false);
     const [selectedCategory, setSelectedCategory] = useState("Last month");
+    const navigate = useNavigate();
+    const [activePage, setActivePage] = useState("dashboard");
+    const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
+    const profileBtnRef = useRef(null);
+    const profileMenuRef = useRef(null);
 
     React.useEffect(() => {
         function handleClickOutside(event) {
@@ -29,6 +34,12 @@ function Main() {
 
     return (
         <div>
+            <img
+                src="/XPLogo.png"
+                alt="Logo"
+                className="absolute top-5 left-4 w-36 h-auto"
+                style={{ zIndex: 10 }}
+            />
             <h1 className="text-white text-3xl mb-10 font-bold">Welcome back</h1>
             <div className="flex space-x-4">
                 <div className="bg-neutral-950 w-1/3 h-80 rounded-xl flex flex-col">
@@ -113,7 +124,7 @@ function Dashboard() {
     return (
         <div className="h-screen bg-black flex flex-col">
             {/* Topbar */}
-            <div className="w-full h-20 bg-neutral-900 text-neutral-500 flex justify-center px-8 space-x-8">
+            <div className="w-full h-20 bg-neutral-900 text-neutral-500 flex justify-center px-8 space-x-8 shadow-md">
                 <button
                     onClick={() => setActivePage("dashboard")}
                     className={`text-lg transition-colors duration-200 ${activePage === "dashboard" ? "text-white underline underline-offset-8" : "hover:text-white"
@@ -144,6 +155,17 @@ function Dashboard() {
                         placeholder="Type here to search..."
                     />
                 </div>
+
+                <button
+                    className="absolute right-8 mt-4 w-12 h-12 rounded-full bg-neutral-800 flex items-center justify-center border-2 border-neutral-700 hover:border-fuchsia-700 transition"
+                    aria-label="Profile"
+                >
+                    <img
+                        src="/PlaceholderProfile.png"
+                        alt="Profile"
+                        className="w-10 h-10 rounded-full object-cover"
+                    />
+                </button>
             </div>
 
             {/* Main Content */}

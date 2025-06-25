@@ -2,17 +2,42 @@ import React, { useEffect, useState } from "react";
 import { Navigate, useNavigate } from "react-router-dom";
 
 function Authentication() {
-  const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const [authError, setAuthError] = useState('');
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
+    const res = await fetch("http://127.0.0.1:8000/send-verification-email/", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email }),
+    });
+    const data = await res.json();
+    setLoading(false);
+    if (res.status === 404) {
+      setAuthError("Email not found.");
+      return;
+    }
+    if (res.ok) {
+      navigate("/Verify", { state: { email } });
+    } else {
+      setAuthError("Email not found.");
+    }
   };
 
   return (
     <div className="flex h-screen">
       <div className="w-1/2 bg-black text-white flex flex-col justify-center px-20">
+        <img
+          src="/XPLogo.png"
+          alt="Logo"
+          className="absolute top-4 left-4 w-36 h-auto"
+          style={{ zIndex: 10 }}
+        />
+        
         <div className="flex mb-6">
           <button onClick={() => navigate("/")} className="text-white hover:underline">
             ← Go back
@@ -27,17 +52,7 @@ function Authentication() {
             Because brains are for quests, not remembering passwords.
         </p>
 
-        <div className="mb-6">
-          <label className="block text-sm mb-1">Username</label>
-          <input
-            type="text"
-            placeholder = "Enter your username" className="w-full px-4 py-2 border-gray-400 rounded-md focus:ring-2 focus:ring-blue-400 outline-none border-2 text-white bg-transparent"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            required
-          />
-        </div>
-
+        <form onSubmit={handleSubmit}>
         <div className="mb-6">
           <label className="block text-sm mb-1">Email address</label>
           <input
@@ -47,15 +62,18 @@ function Authentication() {
             onChange={(e) => setEmail(e.target.value)}
             required
           />
+          {authError && (
+            <div className="text-red-500 text-sm mb-2">{authError}</div>
+          )}
         </div>
 
         <button
-          onClick={() => navigate("/Verify")}
           type="submit"
           className="w-full bg-fuchsia-700 text-white py-2 rounded-md hover:bg-fuchsia-900 transition duration-300 mb-1 mt-2"
         >
           Get Verification Code
         </button>
+        </form>
 
         <div className="flex justify-center">
           <p className="text-1x1">
@@ -66,14 +84,19 @@ function Authentication() {
             onClick={() => navigate("/")}
             type="submit"
             className="text-blue-700 px-2 hover:underline"
+            disabled={loading}
           >
             Sign in
           </button>
         </div>
       </div>
 
-      <div>
-
+      <div className="w-1/2 h-screen relative">
+        <img src="/XparkBackdrop.jpg"
+        alt="Login"
+        className="w-full h-full object-cover"
+        style={{ zIndex: 0 }}
+        />
       </div>
     </div>
   );

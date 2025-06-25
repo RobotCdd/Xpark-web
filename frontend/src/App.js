@@ -15,6 +15,7 @@ import Verify from "./pages/Verify";
 import Update from "./pages/Update";
 import Edit from "./pages/Edit";
 import Action from "./pages/EditUser";
+import AddUser from "./pages/AddUser";
 
 function App() {
   return (
@@ -61,6 +62,10 @@ function App() {
                     <Route
                         path="/Action/:id"
                         element={<Action />}
+                    />
+                    <Route
+                        path="/AddUser"
+                        element={<AddUser />}
                     />
                     {/* Redirect any unmatched routes to the home page */}
                     <Route

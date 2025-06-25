@@ -1,29 +1,36 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 function Edit() {
     const navigate = useNavigate();
+    const [users, setUsers] = useState([]);
 
-    const [users, setUsers] = useState([
-        { id: 1, email: "user1@example.com" },
-        { id: 2, email: "user2@example.com" },
-        { id: 3, email: "user3@example.com" },
-        { id: 4, email: "user4@example.com" },
-        { id: 5, email: "user5@example.com" },
-        { id: 6, email: "user6@example.com" },
-        { id: 7, email: "user7@example.com" },
-        { id: 8, email: "user8@example.com" },
-        { id: 9, email: "user9@example.com" },
-        { id: 10, email: "user10@example.com" },
-    ]);
+    useEffect(() => {
+    fetch("http://127.0.0.1:8000/users/", {
+        cache: "no-store"
+    })
+        .then(res => res.json())
+        .then(data => setUsers(data))
+        .catch(err => console.error("Failed to fetch users:", err));
+}, []);
 
     const handleEdit = (id) => {
         navigate(`/Action/${id}`);
     };
 
     const handleDelete = (id) => {
-        setUsers(users.filter((user) => user.id !== id));
-    };
+    fetch(`http://127.0.0.1:8000/users/${id}/`, {
+        method: "DELETE",
+    })
+    .then(res => {
+        if (res.ok) {
+            setUsers(users.filter((user) => user.id !== id));
+        } else {
+            alert("Failed to delete user.");
+        }
+    })
+    .catch(() => alert("Failed to delete user."));
+};
 
     return (
         <div className="p-8 bg-black h-screen">
@@ -75,6 +82,9 @@ function Edit() {
             </tbody>
             </table>
         </div>
+        <button onClick={() => navigate("/AddUser")} className="text-white hover:underline mt-4">
+                Add User
+        </button>
         </div>
     );
 }

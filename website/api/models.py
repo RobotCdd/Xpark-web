@@ -8,6 +8,12 @@ class Token(models.Model):
     is_used = models.BooleanField(default=False)
     user = models.ForeignKey('User', on_delete=models.CASCADE)
 
+class RegistrationToken(models.Model):
+    email = models.EmailField()
+    token = models.CharField(max_length=255)
+    created_at = models.DateTimeField()
+    expires_at = models.DateTimeField()
+    is_used = models.BooleanField(default=False)
 
 class User(models.Model):
     id = models.AutoField(primary_key=True)
@@ -17,6 +23,7 @@ class User(models.Model):
     password = models.CharField(max_length=255)
     phone = models.CharField(max_length=10, null=True)
     city = models.CharField(max_length=63)
+    is_suspended = models.BooleanField(default=False)
 
     def __str__(self) -> str:
         return self.name
