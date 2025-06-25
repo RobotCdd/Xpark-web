@@ -5,13 +5,16 @@ from .serializers import UserSerializer, TokenSerializer
 
 from django.utils import timezone
 from datetime import timedelta
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from django.core.mail import send_mail
 import random
 from django.contrib.auth.hashers import make_password, check_password
+from django.contrib.auth import authenticate, login
+from django.views.decorators.csrf import csrf_exempt
 
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
@@ -105,18 +108,17 @@ def update_password(request):
         return Response({'success': True})
     except User.DoesNotExist:
         return Response({'success': False, 'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
-    
+
+@csrf_exempt
 @api_view(['POST'])
 def login_view(request):
     email = request.data.get('email')
     password = request.data.get('password')
-    try:
-        user = User.objects.get(email=email)
-        if check_password(password, user.password):
-            return Response({'success': True})
-        else:
-            return Response({'success': False, 'error': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
-    except User.DoesNotExist:
+    user = authenticate(request, username=email, password=password)
+    if user is not None:
+        login(request, user)
+        return Response({'success': True})
+    else:
         return Response({'success': False, 'error': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
     
 @api_view(['POST'])
@@ -139,3 +141,9 @@ def admin_reset_password(request, user_id):
         return Response({'success': True})
     except User.DoesNotExist:
         return Response({'success': False, 'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def current_user(request):
+    serializer = UserSerializer(request.user)
+    return Response(serializer.data)

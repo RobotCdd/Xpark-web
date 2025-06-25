@@ -133,9 +133,14 @@ STATICFILES_DIRS = [
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-CORS_ALLOW_ALL_ORIGINS = True  
+CORS_ALLOW_CREDENTIALS = True
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",
+]
+CORS_ALLOW_ALL_ORIGINS = False
 
 AUTHENTICATION_BACKENDS = [
+    'api.backends.EmailBackend',
     'django.contrib.auth.backends.ModelBackend',
 ]
 
@@ -147,3 +152,12 @@ EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'robotcd3@gmail.com'
 EMAIL_HOST_PASSWORD = 'ekff jqbi sqyl dcvy'
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.SessionAuthentication',
+        'rest_framework.authentication.BasicAuthentication',
+    ],
+}
+
+AUTH_USER_MODEL = 'api.User'

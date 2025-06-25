@@ -6,9 +6,6 @@ function Main() {
     const [selectedCategory, setSelectedCategory] = useState("Last month");
     const navigate = useNavigate();
     const [activePage, setActivePage] = useState("dashboard");
-    const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
-    const profileBtnRef = useRef(null);
-    const profileMenuRef = useRef(null);
 
     React.useEffect(() => {
         function handleClickOutside(event) {
@@ -107,6 +104,40 @@ function Support() {
 function Dashboard() {
     const navigate = useNavigate();
     const [activePage, setActivePage] = useState("dashboard");
+    const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
+    const profileBtnRef = useRef(null);
+    const profileMenuRef = useRef(null);
+
+    const [user, setUser] = useState(null);
+
+    useEffect(() => {
+        fetch("http://127.0.0.1:8000/users/me/", {
+            credentials: "include",
+        })
+            .then(res => {
+                if (res.ok) return res.json();
+                throw new Error("Not authenticated");
+            })
+            .then(data => setUser(data))
+            .catch(() => setUser(null));
+    }, []);
+
+    useEffect(() => {
+        function handleClickOutside(event) {
+            if (
+                profileDropdownOpen &&
+                profileMenuRef.current &&
+                !profileMenuRef.current.contains(event.target) &&
+                profileBtnRef.current &&
+                !profileBtnRef.current.contains(event.target)
+            ) {
+                setProfileDropdownOpen(false);
+            }
+        }
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => document.removeEventListener("mousedown", handleClickOutside);
+    }, [profileDropdownOpen]);
+
 
     const renderContent = () => {
         switch (activePage) {
@@ -157,8 +188,10 @@ function Dashboard() {
                 </div>
 
                 <button
+                    ref={profileBtnRef}
                     className="absolute right-8 mt-4 w-12 h-12 rounded-full bg-neutral-800 flex items-center justify-center border-2 border-neutral-700 hover:border-fuchsia-700 transition"
                     aria-label="Profile"
+                     onClick={() => setProfileDropdownOpen((prev) => !prev)}
                 >
                     <img
                         src="/PlaceholderProfile.png"
@@ -166,6 +199,44 @@ function Dashboard() {
                         className="w-10 h-10 rounded-full object-cover"
                     />
                 </button>
+                {profileDropdownOpen && (
+                    <div
+                        ref={profileMenuRef}
+                        className="absolute right-0 top-20 mt-2 w-1/4 h-5/6 bg-neutral-900 bg-opacity-50 rounded-lg shadow-lg z-50"
+                    >
+                        <div className="flex flex-col items-center p-4">
+                            <img
+                                src="/PlaceholderProfile.png"
+                                alt="Profile"
+                                className="w-48 h-48 rounded-full border-4 border-white object-fill mb-2"
+                            />
+                            <div className="text-white font-semibold mb-1">
+                                {user ? user.name : "Name"}
+                            </div>
+                            <div className="text-neutral-400 text-sm mb-3">
+                                {user ? user.email : "email@example.com"}
+                            </div>
+                            <button
+                                className="w-full bg-fuchsia-700 hover:bg-fuchsia-900 text-white px-4 py-2 rounded mb-2 p-0 m-0"
+                                onClick={() => {
+                                    setProfileDropdownOpen(false);
+                                    navigate("/edit-profile");
+                                }}
+                            >
+                                Edit Profile
+                            </button>
+                            <button
+                                className="w-full bg-neutral-800 hover:bg-neutral-700 text-white px-4 py-2 rounded"
+                                onClick={() => {
+                                    setProfileDropdownOpen(false);
+                                    // Add logout logic
+                                }}
+                            >
+                                Logout
+                            </button>
+                        </div>
+                    </div>
+                )}
             </div>
 
             {/* Main Content */}
