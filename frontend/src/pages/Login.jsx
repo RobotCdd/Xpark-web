@@ -35,19 +35,15 @@ function Login() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setSubmitted(true);
-    if (!isFormValid) return;
-
-    setLoading(true);
-    const res = await fetch("http://127.0.0.1:8000/login/", {
+    const res = await fetch("http://127.0.0.1:8000/api/token/", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      credentials: "include",
       body: JSON.stringify({ email, password }),
     });
-    setLoading(false);
-
+    const data = await res.json();
     if (res.ok) {
+      localStorage.setItem("access", data.access);
+      localStorage.setItem("refresh", data.refresh);
       navigate("/Dashboard");
     } else {
       setLoginError("Email or password is incorrect.");

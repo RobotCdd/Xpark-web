@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
-function Main() {
+function Main({ user }) {
     const [dropdownOpen, setDropdownOpen] = useState(false);
     const [selectedCategory, setSelectedCategory] = useState("Last month");
     const navigate = useNavigate();
@@ -31,13 +31,9 @@ function Main() {
 
     return (
         <div>
-            <img
-                src="/XPLogo.png"
-                alt="Logo"
-                className="absolute top-5 left-4 w-36 h-auto"
-                style={{ zIndex: 10 }}
-            />
-            <h1 className="text-white text-3xl mb-10 font-bold">Welcome back</h1>
+            <h1 className="text-white text-3xl mb-10 font-bold">
+                {user ? `Welcome back, ${user.name}` : "Welcome back"}
+            </h1>
             <div className="flex space-x-4">
                 <div className="bg-neutral-950 w-1/3 h-80 rounded-xl flex flex-col">
                     <div className="flex items-center justify-between px-8 pt-8">
@@ -101,6 +97,170 @@ function Support() {
     );
 }
 
+function EditProfile({ user, onProfileUpdated }) {
+    const [form, setForm] = useState({
+        name: user?.name || "",
+        email: user?.email || "",
+        phone: user?.phone || "",
+        city: user?.city || "",
+        state: user?.state || "",
+        student_id: user?.student_id || "",
+        year_group: user?.year_group || "",
+    });
+    const [saving, setSaving] = useState(false);
+
+    useEffect(() => {
+        setForm({
+            name: user?.name || "",
+            email: user?.email || "",
+            phone: user?.phone || "",
+            city: user?.city || "",
+            state: user?.state || "",
+            student_id: user?.student_id || "",
+            year_group: user?.year_group || "",
+        });
+    }, [user]);
+
+    const handleChange = (e) => {
+        setForm({ ...form, [e.target.name]: e.target.value });
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        setSaving(true);
+        const token = localStorage.getItem("access");
+        const res = await fetch("http://127.0.0.1:8000/users/me/", {
+            method: "PATCH",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`,
+            },
+            body: JSON.stringify(form),
+        });
+        setSaving(false);
+        if (res.ok) {
+            const updated = await res.json();
+            if (onProfileUpdated) onProfileUpdated(updated);
+            alert("Profile updated!");
+        } else {
+            alert("Failed to update profile.");
+        }
+    };
+
+    return (
+        <div className="max-w-4xl mx-auto mt-10 bg-neutral-900 rounded-xl p-8 shadow-lg relative">
+            <button
+                type="submit"
+                form="edit-profile-form"
+                className="absolute top-6 right-8 bg-fuchsia-700 hover:bg-fuchsia-900 text-white px-6 py-2 rounded font-semibold"
+                disabled={saving}
+            >
+                {saving ? "Saving..." : "Save"}
+            </button>
+            <h2 className="text-white text-2xl font-bold mb-8 flex justify-center">Personal info</h2>
+            <form
+                id="edit-profile-form"
+                onSubmit={handleSubmit}
+                className="grid grid-cols-2 gap-x-12 gap-y-6"
+                autoComplete="off"
+            >
+                <div className="flex flex-col items-center col-span-1">
+                    <img
+                        src="/PlaceholderProfile.png"
+                        alt="Profile"
+                        className="w-32 h-32 rounded-full border-4 border-white object-cover mb-4"
+                    />
+                    <div className="text-2xl text-white font-bold mb-1">{form.name}</div>
+                    <div className="text-neutral-400 mb-6">{form.email}</div>
+                </div>
+                <div className="grid grid-cols-2 gap-x-8 gap-y-4 col-span-1">
+                    <div>
+                        <label className="block text-neutral-400 mb-1">Full Name</label>
+                        <input
+                            type="text"
+                            name="name"
+                            value={form.name}
+                            onChange={handleChange}
+                            className="w-full rounded bg-neutral-800 text-white px-3 py-2"
+                        />
+                    </div>
+                    <div>
+                        <label className="block text-neutral-400 mb-1">Display Name</label>
+                        <input
+                            type="text"
+                            name="display_name"
+                            value={form.name}
+                            onChange={handleChange}
+                            className="w-full rounded bg-neutral-800 text-white px-3 py-2"
+                            disabled
+                        />
+                    </div>
+                    <div>
+                        <label className="block text-neutral-400 mb-1">Phone number</label>
+                        <input
+                            type="text"
+                            name="phone"
+                            value={form.phone}
+                            onChange={handleChange}
+                            className="w-full rounded bg-neutral-800 text-white px-3 py-2"
+                        />
+                    </div>
+                    <div>
+                        <label className="block text-neutral-400 mb-1">Email</label>
+                        <input
+                            type="email"
+                            name="email"
+                            value={form.email}
+                            onChange={handleChange}
+                            className="w-full rounded bg-neutral-800 text-white px-3 py-2"
+                        />
+                    </div>
+                    <div>
+                        <label className="block text-neutral-400 mb-1">City</label>
+                        <input
+                            type="text"
+                            name="city"
+                            value={form.city}
+                            onChange={handleChange}
+                            className="w-full rounded bg-neutral-800 text-white px-3 py-2"
+                        />
+                    </div>
+                    <div>
+                        <label className="block text-neutral-400 mb-1">State</label>
+                        <input
+                            type="text"
+                            name="state"
+                            value={form.state}
+                            onChange={handleChange}
+                            className="w-full rounded bg-neutral-800 text-white px-3 py-2"
+                        />
+                    </div>
+                    <div>
+                        <label className="block text-neutral-400 mb-1">Student ID</label>
+                        <input
+                            type="text"
+                            name="student_id"
+                            value={form.student_id}
+                            onChange={handleChange}
+                            className="w-full rounded bg-neutral-800 text-white px-3 py-2"
+                        />
+                    </div>
+                    <div>
+                        <label className="block text-neutral-400 mb-1">Year group</label>
+                        <input
+                            type="text"
+                            name="year_group"
+                            value={form.year_group}
+                            onChange={handleChange}
+                            className="w-full rounded bg-neutral-800 text-white px-3 py-2"
+                        />
+                    </div>
+                </div>
+            </form>
+        </div>
+    );
+}
+
 function Dashboard() {
     const navigate = useNavigate();
     const [activePage, setActivePage] = useState("dashboard");
@@ -111,15 +271,14 @@ function Dashboard() {
     const [user, setUser] = useState(null);
 
     useEffect(() => {
+        const token = localStorage.getItem("access");
         fetch("http://127.0.0.1:8000/users/me/", {
-            credentials: "include",
+          headers: {
+            "Authorization": `Bearer ${token}`,
+          },
         })
-            .then(res => {
-                if (res.ok) return res.json();
-                throw new Error("Not authenticated");
-            })
-            .then(data => setUser(data))
-            .catch(() => setUser(null));
+          .then(res => res.json())
+          .then(data => setUser(data));
     }, []);
 
     useEffect(() => {
@@ -142,11 +301,13 @@ function Dashboard() {
     const renderContent = () => {
         switch (activePage) {
             case "dashboard":
-                return <Main />;
+                return <Main user={user} />;
             case "library":
                 return <GameLibrary />;
             case "support":
                 return <Support />;
+            case "edit-profile":
+                return <EditProfile user={user} onProfileUpdated={setUser} />;
             default:
                 return null;
         }
@@ -156,6 +317,12 @@ function Dashboard() {
         <div className="h-screen bg-black flex flex-col">
             {/* Topbar */}
             <div className="w-full h-20 bg-neutral-900 text-neutral-500 flex justify-center px-8 space-x-8 shadow-md">
+                <img
+                    src="/XPLogo.png"
+                    alt="Logo"
+                    className="absolute top-5 left-4 w-36 h-auto"
+                    style={{ zIndex: 10 }}
+                />
                 <button
                     onClick={() => setActivePage("dashboard")}
                     className={`text-lg transition-colors duration-200 ${activePage === "dashboard" ? "text-white underline underline-offset-8" : "hover:text-white"
@@ -220,7 +387,7 @@ function Dashboard() {
                                 className="w-full bg-fuchsia-700 hover:bg-fuchsia-900 text-white px-4 py-2 rounded mb-2 p-0 m-0"
                                 onClick={() => {
                                     setProfileDropdownOpen(false);
-                                    navigate("/edit-profile");
+                                    setActivePage("edit-profile");
                                 }}
                             >
                                 Edit Profile
@@ -229,7 +396,9 @@ function Dashboard() {
                                 className="w-full bg-neutral-800 hover:bg-neutral-700 text-white px-4 py-2 rounded"
                                 onClick={() => {
                                     setProfileDropdownOpen(false);
-                                    // Add logout logic
+                                    localStorage.removeItem("access");
+                                    localStorage.removeItem("refresh");
+                                    navigate("/");
                                 }}
                             >
                                 Logout

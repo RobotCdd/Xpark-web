@@ -142,8 +142,15 @@ def admin_reset_password(request, user_id):
     except User.DoesNotExist:
         return Response({'success': False, 'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
 
-@api_view(['GET'])
+@api_view(['GET', 'PATCH'])
 @permission_classes([IsAuthenticated])
 def current_user(request):
-    serializer = UserSerializer(request.user)
+    user = request.user
+    if request.method == 'PATCH':
+        serializer = UserSerializer(user, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=400)
+    serializer = UserSerializer(user)
     return Response(serializer.data)
