@@ -16,7 +16,7 @@ function AddUser() {
     const handleSubmit = (e) => {
     e.preventDefault();
 
-    fetch("http://127.0.0.1:8000/users/", {
+    fetch("/api/users/", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -40,7 +40,7 @@ function AddUser() {
         e.preventDefault();
 
         if (pending.isSuspended !== saved.isSuspended) {
-            await fetch(`http://127.0.0.1:8000/users/${id}/suspend/`, {
+            await fetch(`/api/users/${id}/suspend/`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ is_suspended: pending.isSuspended }),
@@ -50,7 +50,7 @@ function AddUser() {
         if (pending.resetPassword) {
             const newPassword = prompt("Enter new password for this user:");
             if (newPassword) {
-                await fetch(`http://127.0.0.1:8000/users/${id}/reset-password/`, {
+                await fetch(`/api/users/${id}/reset-password/`, {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({ password: newPassword }),

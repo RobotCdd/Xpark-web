@@ -6,7 +6,7 @@ function Edit() {
     const [users, setUsers] = useState([]);
 
     useEffect(() => {
-    fetch("http://127.0.0.1:8000/users/", {
+    fetch("/api/users/", {
         cache: "no-store"
     })
         .then(res => res.json())
@@ -19,7 +19,7 @@ function Edit() {
     };
 
     const handleDelete = (id) => {
-    fetch(`http://127.0.0.1:8000/users/${id}/`, {
+    fetch(`/api/users/${id}/`, {
         method: "DELETE",
     })
     .then(res => {
@@ -35,7 +35,7 @@ function Edit() {
     return (
         <div className="p-8 bg-black h-screen">
             <div className="flex mb-6">
-          <button onClick={() => navigate("/")} className="text-white hover:underline">
+          <button onClick={() => navigate("/Dashboard")} className="text-white hover:underline">
             ← Go back
           </button>
         </div>

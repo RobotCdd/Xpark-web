@@ -1,4 +1,5 @@
 from django.db import models
+from django.conf import settings
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseUserManager
 
 class UserManager(BaseUserManager):
@@ -48,3 +49,21 @@ class RegistrationToken(models.Model):
     created_at = models.DateTimeField()
     expires_at = models.DateTimeField()
     is_used = models.BooleanField(default=False)
+
+class Game(models.Model):
+    name = models.CharField(max_length=100)
+    description = models.TextField(blank=True)
+    genre = models.CharField(max_length=50, blank=True)
+    release_date = models.DateField(null=True, blank=True)
+
+    def __str__(self):
+        return self.name
+    
+class UserGameStats(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    game = models.ForeignKey(Game, on_delete=models.CASCADE)
+    completion = models.DecimalField(max_digits=5, decimal_places=2, default=0)  # percent complete
+    time_played = models.PositiveIntegerField(default=0)  # in minutes
+
+    class Meta:
+        unique_together = ('user', 'game')

@@ -10,7 +10,7 @@ function Verify() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const res = await fetch("http://127.0.0.1:8000/verify-code/", {
+    const res = await fetch("/api/verify-code/", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email, code }),
@@ -29,7 +29,7 @@ function Verify() {
       <div className="w-1/2 bg-black text-white flex flex-col justify-center px-20">
       
         <img
-          src="/XPLogo.png"
+          src="/static/XPLogo.png"
           alt="Logo"
           className="absolute top-4 left-4 w-36 h-auto"
           style={{ zIndex: 10 }}
@@ -78,7 +78,7 @@ function Verify() {
       </div>
 
       <div className="w-1/2 h-screen relative">
-        <img src="/XparkBackdrop.jpg"
+        <img src="/static/XparkBackdrop.jpg"
         alt="Login"
         className="w-full h-full object-cover"
         style={{ zIndex: 0 }}

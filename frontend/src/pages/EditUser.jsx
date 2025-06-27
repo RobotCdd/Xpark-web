@@ -17,7 +17,7 @@ function EditUser() {
     });
 
     useEffect(() => {
-        fetch("http://127.0.0.1:8000/users/")
+        fetch("/api/users/")
             .then(res => res.json())
             .then(data => {
                 setUsers(data);
@@ -49,7 +49,7 @@ function EditUser() {
         e.preventDefault();
 
         if (pending.isSuspended !== saved.isSuspended) {
-            await fetch(`http://127.0.0.1:8000/users/${id}/suspend/`, {
+            await fetch(`/api/users/${id}/suspend/`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ is_suspended: pending.isSuspended }),
@@ -57,14 +57,14 @@ function EditUser() {
         }
 
         if (pending.resetPassword) {
-            const newPassword = prompt("Enter new password for this user:");
+            const newPassword = "";
             if (newPassword) {
-                await fetch(`http://127.0.0.1:8000/users/${id}/reset-password/`, {
+                await fetch(`/api/users/${id}/reset-password/`, {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({ password: newPassword }),
                 });
-                alert("Password reset!");
+                alert("Password reset to default");
             }
         }
 

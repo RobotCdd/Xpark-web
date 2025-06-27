@@ -13,11 +13,11 @@ function Login() {
   const [direction, setDirection] = useState("right");
 
   const images = [
-    "/XparkBackdrop.jpg",
-    "/XparkBackdrop2.jpg",
-    "/XparkBackdrop3.jpg",
-    "/XparkBackdrop4.jpg",
-  ]
+    "/static/XparkBackdrop.jpg",
+    "/static/XparkBackdrop2.jpg",
+    "/static/XparkBackdrop3.jpg",
+    "/static/XparkBackdrop4.jpg",
+  ];
 
   const nextImage = () => {
     setDirection("right");
@@ -35,7 +35,7 @@ function Login() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const res = await fetch("http://127.0.0.1:8000/api/token/", {
+    const res = await fetch("/api/token/", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email, password }),
@@ -63,7 +63,7 @@ function Login() {
       <div className="w-1/2 bg-black text-white flex flex-col justify-center px-20">
 
         <img
-          src="/XPLogo.png"
+          src="/static/XPLogo.png"
           alt="Logo"
           className="absolute top-4 left-4 w-36 h-auto"
           style={{ zIndex: 10 }}

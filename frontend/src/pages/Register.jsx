@@ -11,7 +11,7 @@ function Register() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    const res = await fetch("http://127.0.0.1:8000/send-verification-email/", {
+    const res = await fetch("/api/send-verification-email/", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email }),
@@ -33,7 +33,7 @@ function Register() {
     <div className="flex h-screen">
       <div className="w-1/2 bg-black text-white flex flex-col justify-center px-20">
         <img
-          src="/XPLogo.png"
+          src="/static/XPLogo.png"
           alt="Logo"
           className="absolute top-4 left-4 w-36 h-auto"
           style={{ zIndex: 10 }}
@@ -75,7 +75,7 @@ function Register() {
       </div>
 
       <div className="w-1/2 h-screen relative">
-        <img src="/XparkBackdrop.jpg"
+        <img src="/static/XparkBackdrop.jpg"
         alt="Login"
         className="w-full h-full object-cover"
         style={{ zIndex: 0 }}
