@@ -43,3 +43,9 @@ COPY frontend/public/XparkBackdrop.jpg /app/staticfiles/XparkBackdrop.jpg
 COPY frontend/public/XparkBackdrop2.jpg /app/staticfiles/XparkBackdrop2.jpg
 COPY frontend/public/XparkBackdrop3.jpg /app/staticfiles/XparkBackdrop3.jpg
 COPY frontend/public/XparkBackdrop4.jpg /app/staticfiles/XparkBackdrop4.jpg
+COPY frontend/public/Keyboard.png /app/staticfiles/Keyboard.png
+COPY frontend/public/Dice.png /app/staticfiles/Dice.png
+COPY frontend/public/Cube.png /app/staticfiles/Cube.png
+COPY frontend/public/VR.png /app/staticfiles/VR.png
+COPY frontend/public/Stats.png /app/staticfiles/Stats.png
+

@@ -55,6 +55,7 @@ class Game(models.Model):
     description = models.TextField(blank=True)
     genre = models.CharField(max_length=50, blank=True)
     release_date = models.DateField(null=True, blank=True)
+    image = models.URLField(blank=True, null=True) 
 
     def __str__(self):
         return self.name

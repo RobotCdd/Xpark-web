@@ -68,10 +68,10 @@ function EditProfile({ user, onProfileUpdated }) {
         email: user?.email || "",
         phone: user?.phone || "",
         city: user?.city || "",
-        state: user?.state || "",
         student_id: user?.student_id || "",
     });
     const [saving, setSaving] = useState(false);
+    const [lightMode, setLightMode] = useState(false);
 
     useEffect(() => {
         setForm({
@@ -79,10 +79,18 @@ function EditProfile({ user, onProfileUpdated }) {
             email: user?.email || "",
             phone: user?.phone || "",
             city: user?.city || "",
-            state: user?.state || "",
             student_id: user?.student_id || "",
         });
     }, [user]);
+
+    useEffect(() => {
+        if (lightMode) {
+            document.body.classList.remove("dark");
+        } else {
+            document.body.classList.add("dark");
+        }
+        return () => document.body.classList.add("dark");
+    }, [lightMode]);
 
     const handleChange = (e) => {
         setForm({ ...form, [e.target.name]: e.target.value });
@@ -111,7 +119,22 @@ function EditProfile({ user, onProfileUpdated }) {
     };
 
     return (
-        <div className="max-w-4xl mx-auto mt-10 bg-neutral-900 rounded-xl p-8 shadow-lg relative">
+        <div className="max-w-4xl mx-auto mt-10 rounded-xl p-8 shadow-lg relative transition-colors duration-300 bg-white text-black dark:bg-neutral-900 dark:text-white">
+            {/* Light/Dark mode switch */}
+            <div className="absolute top-6 left-8 flex items-center">
+                <span className="mr-2 text-white">🌙</span>
+                <label className="relative inline-flex items-center cursor-pointer">
+                    <input
+                        type="checkbox"
+                        checked={lightMode}
+                        onChange={() => setLightMode((v) => !v)}
+                        className="sr-only peer"
+                    />
+                    <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-fuchsia-700 rounded-full peer dark:bg-gray-700 peer-checked:bg-fuchsia-700 transition-all"></div>
+                    <div className="absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition-transform peer-checked:translate-x-5"></div>
+                </label>
+                <span className="ml-2 text-white">☀️</span>
+            </div>
             <button
                 type="submit"
                 form="edit-profile-form"
@@ -137,16 +160,6 @@ function EditProfile({ user, onProfileUpdated }) {
                     <div className="text-neutral-400 mb-6">{form.email}</div>
                 </div>
                 <div className="grid grid-cols-2 gap-x-8 gap-y-4 col-span-1">
-                    <div>
-                        <label className="block text-neutral-400 mb-1">Student ID</label>
-                        <p
-                            type="text"
-                            name="student_id"
-                            value={form.student_id}
-                            onChange={handleChange}
-                            className="w-full rounded bg-neutral-800 text-white px-3 py-2"
-                        />
-                    </div>
                     <div>
                         <label className="block text-neutral-400 mb-1">Full Name</label>
                         <input
@@ -425,15 +438,14 @@ function MyGames() {
             <div className="flex overflow-x-auto space-x-6 pb-2 hide-scrollbar">
                 {games.map((game, idx) => (
                     <div
-                        key={game.id || idx}
-                        className="min-w-[160px] max-w-[160px] bg-neutral-800 rounded-lg shadow-md flex flex-col items-center p-3"
+                      key={game.id || idx}
+                      className="min-w-[160px] max-w-[160px] h-40 bg-neutral-800 rounded-lg shadow-md flex items-center justify-center overflow-hidden transform transition-transform duration-200 hover:scale-105 cursor-pointer"
                     >
-                        <img
-                            src={game.image || "/static/default-game.png"}
-                            alt={game.name}
-                            className="w-32 h-32 object-cover rounded mb-2"
-                        />
-                        <div className="text-white text-center font-semibold">{game.name}</div>
+                      <img
+                        src={game.image}
+                        alt={game.name}
+                        className="w-full h-full object-cover"
+                      />
                     </div>
                 ))}
             </div>
@@ -456,14 +468,13 @@ function Recommendations() {
                 {games.slice(0, 10).map((game, idx) => (
                     <div
                         key={game.id || idx}
-                        className="min-w-[160px] max-w-[160px] bg-neutral-800 rounded-lg shadow-md flex flex-col items-center p-3"
-                    >
+                        className="min-w-[160px] max-w-[160px] h-40 bg-neutral-800 rounded-lg shadow-md flex items-center justify-center overflow-hidden transform transition-transform duration-200 hover:scale-105 cursor-pointer"
+                        >
                         <img
-                            src={game.image || "/static/default-game.png"}
+                            src={game.image}
                             alt={game.name}
-                            className="w-32 h-32 object-cover rounded mb-2"
+                            className="w-full h-full object-cover"
                         />
-                        <div className="text-white text-center font-semibold">{game.name}</div>
                     </div>
                 ))}
             </div>

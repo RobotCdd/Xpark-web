@@ -11,7 +11,7 @@ class UserSerializer(serializers.ModelSerializer):
         fields = [
             'id', 'name', 'email', 'phone', 'city', 'role', 'is_suspended', 'is_active', 'password'
         ]
-        read_only_fields = ['id', 'role', 'is_suspended', 'is_active']
+        read_only_fields = ['id', 'is_suspended', 'is_active']
 
     def create(self, validated_data):
         if 'password' in validated_data:
