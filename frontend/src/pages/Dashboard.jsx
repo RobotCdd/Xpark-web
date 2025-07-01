@@ -62,7 +62,7 @@ function Support() {
     );
 }
 
-function EditProfile({ user, onProfileUpdated }) {
+function EditProfile({ user, onProfileUpdated, lightMode, setLightMode }) {
     const [form, setForm] = useState({
         name: user?.name || "",
         email: user?.email || "",
@@ -71,7 +71,6 @@ function EditProfile({ user, onProfileUpdated }) {
         student_id: user?.student_id || "",
     });
     const [saving, setSaving] = useState(false);
-    const [lightMode, setLightMode] = useState(false);
 
     useEffect(() => {
         setForm({
@@ -82,15 +81,6 @@ function EditProfile({ user, onProfileUpdated }) {
             student_id: user?.student_id || "",
         });
     }, [user]);
-
-    useEffect(() => {
-        if (lightMode) {
-            document.body.classList.remove("dark");
-        } else {
-            document.body.classList.add("dark");
-        }
-        return () => document.body.classList.add("dark");
-    }, [lightMode]);
 
     const handleChange = (e) => {
         setForm({ ...form, [e.target.name]: e.target.value });
@@ -143,7 +133,7 @@ function EditProfile({ user, onProfileUpdated }) {
             >
                 {saving ? "Saving..." : "Save"}
             </button>
-            <h2 className="text-white text-2xl font-bold mb-8 flex justify-center">Personal info</h2>
+            <h2 className="text-black dark:text-white text-2xl font-bold mb-8 flex justify-center">Personal info</h2>
             <form
                 id="edit-profile-form"
                 onSubmit={handleSubmit}
@@ -156,7 +146,7 @@ function EditProfile({ user, onProfileUpdated }) {
                         alt="Profile"
                         className="w-32 h-32 rounded-full border-4 border-white object-cover mb-4"
                     />
-                    <div className="text-2xl text-white font-bold mb-1">{form.name}</div>
+                    <div className="text-2xl text-black dark:text-white font-bold mb-1">{form.name}</div>
                     <div className="text-neutral-400 mb-6">{form.email}</div>
                 </div>
                 <div className="grid grid-cols-2 gap-x-8 gap-y-4 col-span-1">
@@ -276,9 +266,9 @@ function DashboardCharts() {
     return (
         <div className="flex gap-6">
         {/* Donut Chart */}
-        <div className="bg-neutral-900 rounded-2xl p-6 w-1/3 flex flex-col">
+        <div className="bg-neutral-100 dark:bg-neutral-900 rounded-2xl p-6 w-1/3 flex flex-col">
             <div className="flex items-center justify-between mb-2">
-            <h2 className="text-white text-lg font-semibold">Top Games played</h2>
+            <h2 className="text-black dark:text-white text-lg font-semibold">Top Games played</h2>
                 <div className="relative outline-none">
                     <button
                         id="donutDropdownButton"
@@ -334,7 +324,7 @@ function DashboardCharts() {
                 {donutData.map((entry, idx) => (
                 <div key={entry.name} className="flex items-center mb-1">
                     <span className="inline-block w-3 h-3 rounded-full mr-2" style={{ background: donutColors[idx] }} />
-                    <span className="text-white text-sm">{entry.name}</span>
+                    <span className="text-black dark:text-white text-sm">{entry.name}</span>
                     <span className="ml-2 text-neutral-400 text-xs">{entry.value}%</span>
                 </div>
                 ))}
@@ -343,7 +333,7 @@ function DashboardCharts() {
         </div>
 
         {/* Bar Chart */}
-        <div className="bg-neutral-900 rounded-2xl p-6 w-2/3 flex flex-col">
+        <div className="bg-neutral-100 dark:bg-neutral-900 rounded-2xl p-6 w-2/3 flex flex-col">
             <div className="flex items-center justify-between mb-2">
             <div className="flex gap-4 outline-none">
                 {barTabs.map(tab => (
@@ -434,18 +424,21 @@ function MyGames() {
 
     return (
         <div>
-            <h2 className="text-white text-2xl font-bold mt-6 mb-4">My games</h2>
-            <div className="flex overflow-x-auto space-x-6 pb-2 hide-scrollbar">
+            <h2 className="text-black dark:text-white text-2xl font-bold mt-6 mb-4">My games</h2>
+            <div className="flex overflow-x-auto space-x-10 pb-2 hide-scrollbar">
                 {games.map((game, idx) => (
                     <div
                       key={game.id || idx}
-                      className="min-w-[160px] max-w-[160px] h-40 bg-neutral-800 rounded-lg shadow-md flex items-center justify-center overflow-hidden transform transition-transform duration-200 hover:scale-105 cursor-pointer"
+                      className="min-w-[220px] max-w-[220px] h-56 bg-transparent rounded-lg shadow-md flex flex-col items-center justify-start overflow-hidden transform transition-transform duration-200 hover:scale-105 cursor-pointer"
                     >
                       <img
                         src={game.image}
                         alt={game.name}
-                        className="w-full h-full object-cover"
+                        className="w-full h-40 object-cover rounded-lg"
                       />
+                      <div className="w-full text-center text-black dark:text-white text-lg font-semibold mt-2 truncate px-2">
+                        {game.name}
+                      </div>
                     </div>
                 ))}
             </div>
@@ -463,18 +456,21 @@ function Recommendations() {
 
     return (
         <div>
-            <h2 className="text-white text-2xl font-bold mt-6 mb-4">Recommendations</h2>
-            <div className="flex overflow-x-auto space-x-6 pb-2 hide-scrollbar">
-                {games.slice(0, 10).map((game, idx) => (
+            <h2 className="text-black dark:text-white text-2xl font-bold mt-6 mb-4">Recommendations</h2>
+            <div className="flex overflow-x-auto space-x-10 pb-2 hide-scrollbar">
+                {games.map((game, idx) => (
                     <div
-                        key={game.id || idx}
-                        className="min-w-[160px] max-w-[160px] h-40 bg-neutral-800 rounded-lg shadow-md flex items-center justify-center overflow-hidden transform transition-transform duration-200 hover:scale-105 cursor-pointer"
-                        >
-                        <img
-                            src={game.image}
-                            alt={game.name}
-                            className="w-full h-full object-cover"
-                        />
+                      key={game.id || idx}
+                      className="min-w-[220px] max-w-[220px] h-56 bg-transparent rounded-lg shadow-md flex flex-col items-center justify-start overflow-hidden transform transition-transform duration-200 hover:scale-105 cursor-pointer"
+                    >
+                      <img
+                        src={game.image}
+                        alt={game.name}
+                        className="w-full h-40 object-cover rounded-lg"
+                      />
+                      <div className="w-full text-center text-black dark:text-white text-lg font-semibold mt-2 truncate px-2">
+                        {game.name}
+                      </div>
                     </div>
                 ))}
             </div>
@@ -488,8 +484,20 @@ function Dashboard() {
     const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
     const profileBtnRef = useRef(null);
     const profileMenuRef = useRef(null);
-
     const [user, setUser] = useState(null);
+
+    // Move lightMode state here
+    const [lightMode, setLightMode] = useState(false);
+
+    // Global effect for dark mode
+    useEffect(() => {
+        if (lightMode) {
+            document.body.classList.remove("dark");
+        } else {
+            document.body.classList.add("dark");
+        }
+        return () => document.body.classList.add("dark");
+    }, [lightMode]);
 
     useEffect(() => {
         const token = localStorage.getItem("access");
@@ -528,16 +536,17 @@ function Dashboard() {
             case "support":
                 return <Support />;
             case "edit-profile":
-                return <EditProfile user={user} onProfileUpdated={setUser} />;
+                // Pass lightMode and setLightMode to EditProfile
+                return <EditProfile user={user} onProfileUpdated={setUser} lightMode={lightMode} setLightMode={setLightMode} />;
             default:
                 return null;
         }
     };
 
     return (
-        <div className="h-screen bg-black flex flex-col">
+        <div className="h-screen bg-white text-black dark:bg-black dark:text-white flex flex-col">
             {/* Topbar */}
-            <div className="w-full h-20 bg-neutral-900 text-neutral-500 flex justify-center px-8 space-x-8 shadow-md">
+            <div className="w-full h-20 bg-neutral-100 text-neutral-700 dark:bg-neutral-900 dark:text-neutral-500 flex justify-center px-8 space-x-8 shadow-md">
                 <img
                     src="/static/XPLogo.png"
                     alt="Logo"
@@ -569,7 +578,7 @@ function Dashboard() {
                 <div className="w-96 px-11 flex justify-center items-center">
                     <input
                         type="search"
-                        className="relative m-0 block w-full min-w-0 flex-auto rounded border border-solid border-neutral-300 bg-transparent bg-clip-padding px-3 py-[0.25rem] text-base font-normal leading-[1.6] text-white outline-none transition duration-200 ease-in-out focus:z-[3] focus:border-primary focus:text-neutral-200 focus:shadow-[inset_0_0_0_1px_rgb(59,113,202)] focus:outline-none dark:border-neutral-600 dark:text-neutral-200 dark:placeholder:text-neutral-500 dark:focus:border-primary justify-center border-x-2 border-y-2"
+                        className="relative m-0 block w-full min-w-0 flex-auto rounded border border-solid border-neutral-300 bg-neutral-100 dark:bg-transparent bg-clip-padding px-3 py-[0.25rem] text-base font-normal leading-[1.6] text-black dark:text-white outline-none transition duration-200 ease-in-out focus:z-[3] focus:border-primary focus:text-neutral-200 focus:shadow-[inset_0_0_0_1px_rgb(59,113,202)] focus:outline-none dark:border-neutral-600 dark:placeholder:text-neutral-500 dark:focus:border-primary justify-center border-x-2 border-y-2"
                         id="exampleSearch"
                         placeholder="Type here to search..."
                     />
@@ -590,7 +599,7 @@ function Dashboard() {
                 {profileDropdownOpen && (
                     <div
                         ref={profileMenuRef}
-                        className="absolute right-0 top-20 mt-2 w-1/4 h-5/6 bg-neutral-900 bg-opacity-80 rounded-lg shadow-lg z-50"
+                        className="absolute right-0 top-20 mt-2 w-1/4 h-5/6 bg-white bg-opacity-90 dark:bg-neutral-900 dark:bg-opacity-80 rounded-lg shadow-lg z-50"
                     >
                         <div className="flex flex-col items-center p-4">
                             <img
@@ -598,12 +607,31 @@ function Dashboard() {
                                 alt="Profile"
                                 className="w-40 h-40 rounded-full border-4 border-white object-fill mb-2"
                             />
-                            <div className="text-white font-semibold mb-1 text-4xl">
-                                {user ? user.name : "Name"}
+                            <div className="font-semibold mb-1 text-4xl text-black dark:text-white">
+                              {user ? user.name : "Name"}
                             </div>
-                            <div className="text-neutral-400 text-sm mb-10">
+                            <div className="text-neutral-400 text-sm mb-4">
                                 {user ? user.email : "email@example.com"}
                             </div>
+                            {user && user.role && (
+                              <div className="flex justify-center mb-10">
+                                <span
+                                  className={`
+                                    inline-flex items-center justify-center
+                                    rounded-full
+                                    w-24 h-6
+                                    text-base
+                                    ${user.role === "Admin"
+                                      ? "bg-lime-400 text-black"
+                                      : user.role === "Teacher"
+                                      ? "bg-blue-400 text-white"
+                                      : "bg-fuchsia-400 text-white"}
+                                  `}
+                                >
+                                  {user.role}
+                                </span>
+                              </div>
+                            )}
                             <button
                                 className="w-full bg-fuchsia-700 hover:bg-fuchsia-900 text-white px-4 py-2 rounded mb-2 p-0 m-0"
                                 onClick={() => {
