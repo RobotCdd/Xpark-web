@@ -14,9 +14,9 @@ function Login() {
 
   const images = [
     "/static/XparkBackdrop.jpg",
-    "/static/XparkBackdrop2.jpg",
-    "/static/XparkBackdrop3.jpg",
-    "/static/XparkBackdrop4.jpg",
+    "/static/Stats.png",
+    "/static/VR.png",
+    "/static/Keyboard.png",
   ];
 
   const nextImage = () => {
