@@ -1,0 +1,7 @@
+Things todo:
+
+Add security to the credentials: maybe Infisical.
+
+Add an authentication in the login. Maybe login tries or google authentication.
+
+The docker is public need to find a way to hide it so that it cannot be accessed by the public otherwise they can access the database.
